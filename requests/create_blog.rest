@@ -1,0 +1,9 @@
+POST http://localhost:3001/api/blogs
+Content-Type: application/json
+
+{
+  "title":"Blog 1",
+  "author": "Shivam Kaushik",
+  "url": "www.medium.com",
+  "likes": 10
+}
