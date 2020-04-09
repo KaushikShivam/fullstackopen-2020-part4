@@ -95,3 +95,17 @@ test('blog is deleted successfully', async () => {
 
   expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length - 1)
 })
+
+test('blog is updated successfully', async () => {
+  const blogs = await helper.blogsInDb()
+  const blogToUpdate = blogs[0]
+
+  const newBlog = { ...blogToUpdate, title: 'updated blog' }
+
+  const response = await api
+    .put(`/api/blogs/${blogToUpdate.id}`)
+    .send(newBlog)
+    .expect(200)
+
+  expect(response.body.title).toBe('updated blog')
+})
