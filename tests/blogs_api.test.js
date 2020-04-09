@@ -34,10 +34,29 @@ test('unique identifier id is defined', async () => {
 
 test('a blog is created successfully', async () => {
   const newBlog = {
-    name: 'blog 4',
-    author: 'author 4',
-    url: 'www.blog4.com',
+    title: 'yolo',
+    author: 'author 5',
+    url: 'www.blog5.com',
     likes: 25,
+  }
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  const blogsAtEnd = await Blog.find()
+  expect(blogsAtEnd.length).toBe(helper.initialBlogs.length + 1)
+
+  const contents = blogsAtEnd.map((n) => n.title)
+  expect(contents).toContain('yolo')
+})
+
+test('likes property defaults to 0', async () => {
+  const newBlog = {
+    title: 'yolo',
+    author: 'author 5',
+    url: 'www.blog5.com',
   }
   const response = await api
     .post('/api/blogs')
@@ -49,5 +68,7 @@ test('a blog is created successfully', async () => {
   expect(blogsAtEnd.length).toBe(helper.initialBlogs.length + 1)
 
   const contents = blogsAtEnd.map((n) => n.title)
-  expect(contents).toContain('blog 4')
+  expect(contents).toContain('yolo')
+
+  expect(response.body.likes).toBe(0)
 })
