@@ -1,8 +1,8 @@
 const supertest = require('supertest')
 const mongoose = require('mongoose')
 const helper = require('./test_helper')
-const Blog = require('./../models/blog')
-const app = require('./../app')
+const Blog = require('../models/blog')
+const app = require('../app')
 
 const api = supertest(app)
 
@@ -30,4 +30,24 @@ test('unique identifier id is defined', async () => {
   response.body.forEach((blog) => {
     expect(blog.id).toBeDefined()
   })
+})
+
+test('a blog is created successfully', async () => {
+  const newBlog = {
+    name: 'blog 4',
+    author: 'author 4',
+    url: 'www.blog4.com',
+    likes: 25,
+  }
+  const response = await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  const blogsAtEnd = await Blog.find()
+  expect(blogsAtEnd.length).toBe(helper.initialBlogs.length + 1)
+
+  const contents = blogsAtEnd.map((n) => n.title)
+  expect(contents).toContain('blog 4')
 })
