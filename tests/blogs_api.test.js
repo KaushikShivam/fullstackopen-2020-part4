@@ -2,15 +2,37 @@ const supertest = require('supertest')
 const mongoose = require('mongoose')
 const helper = require('./test_helper')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 const app = require('../app')
 
 const api = supertest(app)
+
+beforeAll(async () => {
+  await User.deleteMany()
+  await User.create({ username: 'shivamkaushik', password: 'password' })
+})
 
 beforeEach(async () => {
   await Blog.deleteMany()
   for (const blog of helper.initialBlogs) {
     await Blog.create(blog)
   }
+})
+
+let token = ''
+beforeEach(async (done) => {
+  await api
+    .post('/api/login')
+    .send({
+      email: 'shivamkaushik',
+      password: 'password',
+    })
+    .end((err, response) => {
+      token = response.body.token
+      console.log('haha', token)
+      console.log(err)
+      done()
+    })
 })
 
 test('blogs are returned as json', async () => {
@@ -33,6 +55,7 @@ test('unique identifier id is defined', async () => {
 })
 
 test('a blog is created successfully', async () => {
+  console.log(token)
   const newBlog = {
     title: 'yolo',
     author: 'author 5',
@@ -41,6 +64,7 @@ test('a blog is created successfully', async () => {
   }
   await api
     .post('/api/blogs')
+    .set({ Authorization: token })
     .send(newBlog)
     .expect(201)
     .expect('Content-Type', /application\/json/)
