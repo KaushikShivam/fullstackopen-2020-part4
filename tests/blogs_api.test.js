@@ -109,3 +109,7 @@ test('blog is updated successfully', async () => {
 
   expect(response.body.title).toBe('updated blog')
 })
+
+afterAll(() => {
+  mongoose.connection.close()
+})
