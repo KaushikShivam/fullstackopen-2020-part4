@@ -26,6 +26,10 @@ const errorHandler = (error, request, response, next) => {
       error: 'invalid token',
     })
   }
+
+  logger.error(error.message)
+
+  next(error)
 }
 
 module.exports = {
