@@ -45,7 +45,7 @@ test('a blog is created successfully', async () => {
     .expect(201)
     .expect('Content-Type', /application\/json/)
 
-  const blogsAtEnd = await Blog.find()
+  const blogsAtEnd = await helper.blogsInDb()
   expect(blogsAtEnd.length).toBe(helper.initialBlogs.length + 1)
 
   const contents = blogsAtEnd.map((n) => n.title)
@@ -64,11 +64,23 @@ test('likes property defaults to 0', async () => {
     .expect(201)
     .expect('Content-Type', /application\/json/)
 
-  const blogsAtEnd = await Blog.find()
+  const blogsAtEnd = await helper.blogsInDb()
   expect(blogsAtEnd.length).toBe(helper.initialBlogs.length + 1)
 
   const contents = blogsAtEnd.map((n) => n.title)
   expect(contents).toContain('yolo')
 
   expect(response.body.likes).toBe(0)
+})
+
+test('blog without content is not added', async () => {
+  const newBlog = {
+    author: 'author 5',
+  }
+
+  await api.post('/api/blogs').send(newBlog).expect(400)
+
+  const blogsAtEnd = await helper.blogsInDb()
+
+  expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
 })
